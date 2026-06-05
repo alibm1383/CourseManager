@@ -1,12 +1,25 @@
 package Utilities;
-import org.mindrot.jbcrypt.BCrypt;
+import java.security.MessageDigest;
 
 public class PasswordUtils {
-    public static String hashPassword(String plainPassword) {
-        return BCrypt.hashpw(plainPassword, BCrypt.gensalt());
+
+    public static String hashPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] bytes = md.digest(password.getBytes());
+
+            StringBuilder sb = new StringBuilder();
+            for (byte b : bytes) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static boolean checkPassword(String plainPassword, String hashedPassword) {
-        return BCrypt.checkpw(plainPassword, hashedPassword);
+    public static boolean checkPassword(String password, String hashed) {
+        return hashPassword(password).equals(hashed);
     }
 }
